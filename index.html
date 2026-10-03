@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librito de Cumpleaños</title>
+  <!-- Fuentes de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 100vw;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
+      /* Fondo con tono Pantone 17-4033 TCX (#5480AC) */
+      background: linear-gradient(-45deg, #2b4969, #3b638e, #5480ac, #739ec9);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* PANTALLA DE INICIO (DESBLOQUEA LA MÚSICA EN CELULARES) */
+    .start-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(-45deg, #2b4969, #3b638e, #5480ac, #739ec9);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .start-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      padding: 35px 25px;
+      border-radius: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      max-width: 380px;
+      width: 100%;
+      color: #1d3557;
+    }
+
+    .start-card h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: #2b4969;
+    }
+
+    .start-card p {
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+      color: #5480ac;
+    }
+
+    .start-btn {
+      background: linear-gradient(135deg, #5480ac, #2b4969);
+      color: white;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(84, 128, 172, 0.4);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Contenedor del Libro */
+    .book-container {
+      position: relative;
+      z-index: 10;
+      max-width: 450px;
+      width: 100%;
+      margin: auto;
+    }
+
+    .book {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 24px;
+      padding: 25px 22px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25), 
+                  0 0 25px rgba(84, 128, 172, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      text-align: center;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Encabezado */
+    .card-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #5480ac, #2b4969);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(84, 128, 172, 0.4);
+    }
+
+    /* Área de las Páginas */
+    .pages-wrapper {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .page {
+      background: #f8fafc;
+      border-left: 4px solid #5480ac;
+      border-radius: 14px;
+      padding: 22px;
+      text-align: left;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.03), 0 4px 12px rgba(0,0,0,0.05);
+      width: 100%;
+      display: none;
+      box-sizing: border-box;
+      animation: pageTurn 0.35s ease-in-out forwards;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Animación de cambio de página */
+    @keyframes pageTurn {
+      0% {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Letra de Carta Entendible */
+    .page p {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.65rem;
+      font-weight: 600;
+      line-height: 1.6;
+      color: #1d3557;
+      white-space: pre-line;
+    }
+
+    /* Controles de Navegación del Librito */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding-top: 15px;
+      border-top: 1px solid rgba(84, 128, 172, 0.18);
+    }
+
+    .btn-page {
+      background: linear-gradient(135deg, #5480ac, #2b4969);
+      color: white;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(84, 128, 172, 0.3);
+    }
+
+    .btn-page:active {
+      transform: scale(0.95);
+    }
+
+    .btn-page:disabled {
+      background: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .page-number {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #5480ac;
+    }
+
+    /* Emojis cayendo */
+    .emoji {
+      position: fixed;
+      top: -50px;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      animation: fall linear infinite;
+    }
+
+    @keyframes fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(105vh) rotate(360deg);
+        opacity: 0.2;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PANTALLA INICIAL (PERMITE REPRODUCIR AUDIO EN CELULARES) -->
+  <div class="start-overlay" id="startOverlay">
+    <div class="start-card">
+      <h2>¡Tienes un mensaje especial! 💌</h2>
+      <p>Toca el botón para abrir tu carta especial ✨</p>
+      <button class="start-btn" onclick="startApp()">Abrir Carta 💖</button>
+    </div>
+  </div>
+
+  <!-- LIBRITO DE CUMPLEAÑOS -->
+  <div class="book-container">
+    <div class="book">
+      
+      <!-- ENCABEZADO SUPERIOR -->
+      <div>
+        <span class="card-badge">✨ FELIZ CUMPLEAÑOS MI HOMBRECITO LINDO 💞✨</span>
+      </div>
+      
+      <!-- PÁGINAS DEL LIBRITO -->
+      <div class="pages-wrapper">
+        
+        <!-- PÁGINA 1 -->
+        <div class="page active">
+          <p>
+            ¡Feliz cumpleaños! 🥳🥳
+
+            Espero que te la pases muy bien. Gracias por todos esos detalles que me has dado este año 🥺💗
+          </p>
+        </div>
+
+        <!-- PÁGINA 2 -->
+        <div class="page">
+          <p>
+            Te amou mucho mi Dami
+
+            Gracias por permitirme ser tu novia, gracias por aguantarme, Gracias por tu amor hacia mi✨
+          </p>
+        </div>
+
+        <!-- PÁGINA 3 -->
+        <div class="page">
+          <p>
+            Gracias por elegirme Ami, cuando talvez tú tenías mejores opciones...
+
+            Todos los días me despierto muy feliz porque tengo una persona maravillosa Ami lado 💙✨
+          </p>
+        </div>
+
+        <!-- PÁGINA 4 -->
+        <div class="page">
+          <p>
+            y si la vida algún día me lo permite...
+
+            Quisiera pasar los días de mi vida contigo ya que me haces muy feliz, te amo mi Damiancito. 🎉🎂💞
+          </p>
+        </div>
+
+        <!-- PÁGINA 5 -->
+        <div class="page">
+          <p>
+            Feliz cumpleaños mi amorcito!!💓
+          </p>
+        </div>
+
+      </div>
+
+      <!-- BOTONES DE NAVEGACIÓN DE PÁGINAS -->
+      <div class="controls">
+        <button class="btn-page" id="prevBtn" onclick="changePage(-1)" disabled>◀ Anterior</button>
+        <span class="page-number" id="pageNum">Página 1 de 5</span>
+        <button class="btn-page" id="nextBtn" onclick="changePage(1)">Siguiente ▶</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ARCHIVO DE AUDIO -->
+  <audio id="bgMusic" loop>
+    <source src="cancion.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ============================================================
+    // INICIAR CARTA Y MÚSICA CON UN TAP (RESUELVE EL BLOQUEO)
+    // ============================================================
+    function startApp() {
+      const audio = document.getElementById('bgMusic');
+      
+      // Intentar reproducir música
+      audio.play().catch(err => {
+        console.log("Error al reproducir audio: ", err);
+      });
+
+      // Ocultar pantalla de inicio
+      const overlay = document.getElementById('startOverlay');
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.4s ease';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 400);
+    }
+
+    // ============================================================
+    // LÓGICA DEL LIBRITO (PASAR PÁGINAS)
+    // ============================================================
+    let currentPage = 0;
+    let pages = document.querySelectorAll('.page');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageNum = document.getElementById('pageNum');
+
+    function updateBook() {
+      pages = document.querySelectorAll('.page');
+      pages.forEach((page, index) => {
+        page.classList.toggle('active', index === currentPage);
+      });
+
+      pageNum.innerText = `Página ${currentPage + 1} de ${pages.length}`;
+      prevBtn.disabled = currentPage === 0;
+      nextBtn.disabled = currentPage === pages.length - 1;
+    }
+
+    function changePage(direction) {
+      if (currentPage + direction >= 0 && currentPage + direction < pages.length) {
+        currentPage += direction;
+        updateBook();
+      }
+    }
+
+    // Inicializar
+    updateBook();
+
+    // ============================================================
+    // EMOJIS CAYENDO
+    // ============================================================
+    const EMOJIS = ['🎂', '🎁', '🎉', '💙', '✨', '🎈', '⭐', '💞'];
+
+    function createEmoji() {
+      const emoji = document.createElement('div');
+      emoji.classList.add('emoji');
+      emoji.innerText = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+      emoji.style.left = Math.random() * 100 + 'vw';
+      
+      const size = Math.random() * 22 + 18; 
+      emoji.style.fontSize = size + 'px';
+      
+      const duration = Math.random() * 3 + 4; 
+      emoji.style.animationDuration = duration + 's';
+      
+      document.body.appendChild(emoji);
+      
+      setTimeout(() => {
+        emoji.remove();
+      }, duration * 1000);
+    }
+
+    setInterval(createEmoji, 350);
+  </script>
+</body>
+</html>
